@@ -304,7 +304,8 @@ limitations under the License.
     },
     mounted() {
       this.skills = this.skillsProp.map((item) => {
-        const withSubjId = { subjectId: this.subjectId, refreshCounter: 0, ...item };
+        const withSubjId = { refreshCounter: 0, ...item };
+        withSubjId.subjectId = this.subjectId;
         return SkillsService.enhanceWithTimeWindow(withSubjId);
       });
       this.skillsOriginal = this.skills.map((item) => item);
@@ -383,8 +384,9 @@ limitations under the License.
 
         SkillsService.saveSkill(skill)
           .then((skillRes) => {
-            let createdSkill = skillRes;
-            createdSkill = { subjectId: this.subjectId, ...createdSkill, created: new Date(createdSkill.created) };
+            const createdSkill = skillRes;
+            createdSkill.subjectId = this.subjectId;
+            createdSkill.created = new Date(createdSkill.created);
             if (item1Index >= 0) {
               createdSkill.refreshCounter = this.skills[item1Index].refreshCounter + 1;
               this.skills.splice(item1Index, 1, createdSkill);
