@@ -43,8 +43,9 @@ export default {
     return axios.get(`/admin/projects/${projectId}/subjects/${subjectId}/skills`)
       .then((response) => response.data);
   },
-  getProjectSkills(projectId) {
-    return axios.get(`/admin/projects/${projectId}/skills`)
+  getProjectSkills(projectId, skillNameQuery = null) {
+    const query = skillNameQuery ? `?skillNameQuery=${skillNameQuery}` : '';
+    return axios.get(`/admin/projects/${projectId}/skills${query}`)
       .then((response) => response.data);
   },
   saveSkill(skill) {
