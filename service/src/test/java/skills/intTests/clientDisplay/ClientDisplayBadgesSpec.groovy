@@ -18,6 +18,7 @@ package skills.intTests.clientDisplay
 import skills.intTests.utils.DefaultIntSpec
 import skills.intTests.utils.SkillsFactory
 import skills.intTests.utils.SkillsService
+import spock.lang.IgnoreRest
 
 class ClientDisplayBadgesSpec extends DefaultIntSpec {
 
@@ -550,7 +551,7 @@ class ClientDisplayBadgesSpec extends DefaultIntSpec {
         def proj2 = SkillsFactory.createProject(2)
         def proj2_subj = SkillsFactory.createSubject(2, 1)
         List<Map> proj2_skills = SkillsFactory.createSkills(2, 2, 1)
-        proj2_skills.get(0).pointIncrement=100
+        proj2_skills.get(0).pointIncrement = 100
 
         skillsService.createProject(proj2)
         skillsService.createSubject(proj2_subj)
@@ -558,12 +559,14 @@ class ClientDisplayBadgesSpec extends DefaultIntSpec {
 
         skillsService.addBadge([projectId: proj2.projectId, badgeId: badge1, name: 'Badge 1', description: 'This is a first badge', iconClass: "fa fa-seleted-icon",])
         skillsService.assignSkillToBadge([projectId: proj2.projectId, badgeId: badge1, skillId: proj2_skills.get(0).skillId])
+        //proj2 badge1, proj2 skills[0]
 
         // global badge
         Map badge = [badgeId: "globalBadge", name: 'Badge 1', description: 'This is a first badge', iconClass: "fa fa-seleted-icon"]
         badge.helpUrl = "http://foo.org"
         supervisorSkillsService.createGlobalBadge(badge)
         supervisorSkillsService.assignSkillToGlobalBadge(projectId: proj1.projectId, badgeId: badge.badgeId, skillId: proj1_skills.get(0).skillId)
+        //global badge has dep on proj1 skills[0]
 
         // add skill
         skillsService.addSkill([projectId: proj1.projectId, skillId: proj1_skills.get(0).skillId], userId, new Date())
@@ -592,7 +595,8 @@ class ClientDisplayBadgesSpec extends DefaultIntSpec {
         summaries.find { it.badgeId == "globalBadge" }.numSkillsAchieved == 1
         summaries.find { it.badgeId == "badge1" }.numSkillsAchieved == 1
 
-        summary2.badges.numBadgesCompleted == 1
+        //global badge with no proj2 skills should not be included in proj2 summary completed badge count
+        summary2.badges.numBadgesCompleted == 0
         summaries2.size() == 1
         summaries2.find { it.badgeId == "badge1" }.numSkillsAchieved == 0
 
