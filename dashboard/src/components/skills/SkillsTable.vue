@@ -303,13 +303,7 @@ limitations under the License.
       },
     },
     mounted() {
-      this.skills = this.skillsProp.map((item) => {
-        const withSubjId = { refreshCounter: 0, ...item };
-        withSubjId.subjectId = this.subjectId;
-        return SkillsService.enhanceWithTimeWindow(withSubjId);
-      });
-      this.skillsOriginal = this.skills.map((item) => item);
-      this.disableFirstAndLastButtons();
+      this.initSkills(this.skillsProp);
       this.table.options.pagination.totalRows = this.skills.length;
       this.table.options.busy = false;
     },
@@ -325,6 +319,15 @@ limitations under the License.
       },
     },
     methods: {
+      initSkills(skillsParam) {
+        this.skills = skillsParam.map((item) => {
+          const withSubjId = { refreshCounter: 0, ...item };
+          withSubjId.subjectId = this.subjectId;
+          return SkillsService.enhanceWithTimeWindow(withSubjId);
+        });
+        this.skillsOriginal = this.skills.map((item) => item);
+        this.disableFirstAndLastButtons();
+      },
       applyFilters() {
         if (this.table.filter.name && this.table.filter.name.length > 0) {
           this.skills = this.skillsOriginal.filter((item) => {
@@ -500,8 +503,7 @@ limitations under the License.
         SkillsService.updateSkill(row, actionToSubmit)
           .then(() => {
             SkillsService.getSubjectSkills(this.projectId, this.subjectId).then((data) => {
-              this.skills = data;
-              this.disableFirstAndLastButtons();
+              this.initSkills(data);
             });
           });
       },
